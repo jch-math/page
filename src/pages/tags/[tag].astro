@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+import PageTitle from '@components/PageTitle.astro';
+import TagList from '@components/TagList.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { byDateDesc, entrySlug, formatDate, uniqueTags, visiblePost, visibleResource, withBase } from '@lib/site';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('posts')).filter(visiblePost);
+  const resources = (await getCollection('resources')).filter(visibleResource);
+  const projects = await getCollection('projects');
+  const tags = uniqueTags([...posts, ...resources, ...projects]);
+  return tags.map((tag) => ({
+    params: { tag },
+    props: { tag },
+  }));
+}
+
+const { tag } = Astro.props;
+const posts = (await getCollection('posts')).filter((post) => visiblePost(post) && post.data.tags.includes(tag)).sort(byDateDesc);
+const resources = (await getCollection('resources')).filter((resource) => visibleResource(resource) && resource.data.tags.includes(tag)).sort(byDateDesc);
+const projects = (await getCollection('projects')).filter((project) => project.data.tags.includes(tag)).sort(byDateDesc);
+---
+
+<BaseLayout title={`Tag: ${tag}`} description={`Content tagged ${tag}.`}>
+  <PageTitle eyebrow="Tag" title={tag} description={`Content tagged ${tag}.`} />
+  <ol class="item-list list-panel">
+    {
+      [...posts, ...resources, ...projects].sort(byDateDesc).map((entry) => {
+        const collection = entry.collection;
+        const href = `/${collection}/${entrySlug(entry)}/`;
+        return (
+          <li class="item-row">
+            <header>
+              <h2><a href={withBase(href)}>{entry.data.title}</a></h2>
+              <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
+            </header>
+            <p>{entry.data.summary}</p>
+            <TagList tags={entry.data.tags} />
+          </li>
+        );
+      })
+    }
+  </ol>
+</BaseLayout>

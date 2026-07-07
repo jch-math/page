@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+import PageTitle from '@components/PageTitle.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { byDateAsc, byDateDesc, entrySlug, formatDateTime, isPastEvent, isUpcomingEvent, withBase } from '@lib/site';
+
+const events = await getCollection('events');
+const upcomingEvents = events.filter(isUpcomingEvent).sort(byDateAsc);
+const archivedEvents = events.filter(isPastEvent).sort(byDateDesc);
+---
+
+<BaseLayout title="Events" description="Seminars, talks, reading groups, workshops, deadlines, and personal events.">
+  <PageTitle title="Events" description="Seminars, talks, reading groups, workshops, deadlines, and personal events." />
+  <section>
+    <div class="section-header">
+      <h2>Upcoming</h2>
+    </div>
+    <ol class="item-list list-panel">
+      {
+        upcomingEvents.length > 0 ? (
+          upcomingEvents.map((event) => (
+            <li class="item-row">
+              <header>
+                <h3><a href={withBase(`/events/${entrySlug(event)}/`)}>{event.data.title}</a></h3>
+                <time datetime={event.data.date.toISOString()}>{formatDateTime(event.data.date, event.data.time)}</time>
+              </header>
+              <p>{event.data.summary}</p>
+              <span class="meta">{event.data.location} · {event.data.eventType}</span>
+            </li>
+          ))
+        ) : (
+          <li class="item-row"><p>No upcoming events yet.</p></li>
+        )
+      }
+    </ol>
+  </section>
+
+  <section class="spaced-section">
+    <div class="section-header">
+      <h2>Archive</h2>
+    </div>
+    <ol class="item-list list-panel">
+      {
+        archivedEvents.map((event) => (
+          <li class="item-row">
+            <header>
+              <h3><a href={withBase(`/events/${entrySlug(event)}/`)}>{event.data.title}</a></h3>
+              <time datetime={event.data.date.toISOString()}>{formatDateTime(event.data.date, event.data.time)}</time>
+            </header>
+            <p>{event.data.summary}</p>
+            <span class="meta">{event.data.location} · {event.data.status}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+</BaseLayout>

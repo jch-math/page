@@ -1,0 +1,20 @@
+---
+import { withBase } from '@lib/site';
+
+const { profile } = Astro.props;
+const year = new Date().getFullYear();
+const copyrightName = profile?.footer?.copyrightName ?? profile?.name ?? 'Self Page';
+---
+
+<footer class="site-footer">
+  <div>
+    <strong>{copyrightName}</strong>
+    <span>{year}</span>
+    {profile?.footer?.license && <span>{profile.footer.license}</span>}
+  </div>
+  <nav aria-label="Footer navigation">
+    <a href={withBase('/rss.xml')}>RSS</a>
+    {profile?.links?.github && <a href={profile.links.github}>GitHub</a>}
+    {profile?.links?.email && <a href={profile.links.email}>Email</a>}
+  </nav>
+</footer>

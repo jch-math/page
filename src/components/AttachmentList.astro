@@ -1,0 +1,22 @@
+---
+import { withBase } from '@lib/site';
+
+const { attachments = [], title = 'Materials' } = Astro.props;
+---
+
+{
+  attachments.length > 0 && (
+    <section class="attachment-list" aria-labelledby={`${title.toLowerCase()}-heading`}>
+      <h2 id={`${title.toLowerCase()}-heading`}>{title}</h2>
+      <ul>
+        {attachments.map((item) => (
+          <li>
+            <a href={withBase(item.url)}>{item.title}</a>
+            <span>{item.type}</span>
+            {item.description && <p>{item.description}</p>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

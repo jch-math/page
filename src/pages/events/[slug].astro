@@ -1,0 +1,53 @@
+---
+import { getCollection, render } from 'astro:content';
+import AttachmentList from '@components/AttachmentList.astro';
+import ContentMeta from '@components/ContentMeta.astro';
+import PageTitle from '@components/PageTitle.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { entrySlug } from '@lib/site';
+
+export async function getStaticPaths() {
+  const events = await getCollection('events');
+  return events.map((event) => ({
+    params: { slug: entrySlug(event) },
+    props: { event },
+  }));
+}
+
+const { event } = Astro.props;
+const { Content } = await render(event);
+---
+
+<BaseLayout title={event.data.title} description={event.data.summary}>
+  <PageTitle eyebrow={event.data.eventType} title={event.data.title} description={event.data.summary} />
+  <div class="detail-grid">
+    <aside>
+      <ContentMeta
+        date={event.data.date}
+        time={event.data.time}
+        status={event.data.status}
+        type={event.data.eventType}
+        location={event.data.location}
+      />
+      {
+        event.data.speakers.length > 0 && (
+          <section class="attachment-list">
+            <h2>Speakers</h2>
+            <ul>
+              {event.data.speakers.map((speaker) => (
+                <li>
+                  {speaker.url ? <a href={speaker.url}>{speaker.name}</a> : <span>{speaker.name}</span>}
+                  {speaker.affiliation && <span>{speaker.affiliation}</span>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+      <AttachmentList attachments={event.data.materials} />
+    </aside>
+    <article class="prose">
+      <Content />
+    </article>
+  </div>
+</BaseLayout>

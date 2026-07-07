@@ -1,0 +1,17 @@
+name: "Your Name"
+siteTitle: "Your Name"
+tagline: "Research notes, articles, events, and resources"
+role: "Researcher / Developer"
+affiliation: "Institution or organization"
+location: "City, Country"
+bio: "This site collects articles, seminar schedules, project notes, and public resources."
+interests:
+  - "Artificial Intelligence"
+  - "Systems"
+  - "Mathematics"
+links:
+  email: "mailto:name@example.com"
+  github: "https://github.com/username"
+footer:
+  copyrightName: "Your Name"
+  license: "CC BY 4.0"

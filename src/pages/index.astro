@@ -1,0 +1,172 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import PageTitle from '@components/PageTitle.astro';
+import TagList from '@components/TagList.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import {
+  byDateAsc,
+  byDateDesc,
+  entrySlug,
+  formatDate,
+  isUpcomingEvent,
+  publicProject,
+  visiblePost,
+  visibleResource,
+  withBase,
+} from '@lib/site';
+
+const profile = (await getEntry('profile', 'site'))?.data;
+const posts = (await getCollection('posts')).filter(visiblePost).sort(byDateDesc);
+const events = await getCollection('events');
+const resources = (await getCollection('resources')).filter(visibleResource).sort(byDateDesc);
+const projects = (await getCollection('projects')).filter(publicProject).sort(byDateDesc);
+
+const upcomingEvents = events.filter(isUpcomingEvent).sort(byDateAsc).slice(0, 4);
+const featuredPosts = posts.filter((post) => post.data.featured).slice(0, 3);
+const featuredProjects = projects.filter((project) => project.data.featured).slice(0, 3);
+
+const latestUpdates = [
+  ...posts.map((entry) => ({
+    kind: 'Post',
+    title: entry.data.title,
+    date: entry.data.date,
+    summary: entry.data.summary,
+    href: `/posts/${entrySlug(entry)}/`,
+  })),
+  ...events.map((entry) => ({
+    kind: 'Event',
+    title: entry.data.title,
+    date: entry.data.date,
+    summary: entry.data.summary,
+    href: `/events/${entrySlug(entry)}/`,
+  })),
+  ...resources.map((entry) => ({
+    kind: 'Resource',
+    title: entry.data.title,
+    date: entry.data.date,
+    summary: entry.data.summary,
+    href: `/resources/${entrySlug(entry)}/`,
+  })),
+  ...projects.map((entry) => ({
+    kind: 'Project',
+    title: entry.data.title,
+    date: entry.data.date,
+    summary: entry.data.summary,
+    href: `/projects/${entrySlug(entry)}/`,
+  })),
+]
+  .sort((a, b) => Number(b.date) - Number(a.date))
+  .slice(0, 8);
+---
+
+<BaseLayout title={profile?.siteTitle} description={profile?.tagline}>
+  <div class="home-grid">
+    <section class="intro-panel">
+      <PageTitle eyebrow={profile?.role} title={profile?.name ?? 'Your Name'} description={profile?.tagline} />
+      <p>{profile?.bio}</p>
+      {profile?.affiliation && <p class="muted">{profile.affiliation}</p>}
+      {
+        profile?.interests?.length > 0 && (
+          <ul class="tag-list" aria-label="Interests">
+            {profile.interests.map((interest) => (
+              <li><span class="pill">{interest}</span></li>
+            ))}
+          </ul>
+        )
+      }
+      <div class="links">
+        {profile?.links?.github && <a href={profile.links.github}>GitHub</a>}
+        {profile?.links?.email && <a href={profile.links.email}>Email</a>}
+        {profile?.links?.cv && <a href={withBase(profile.links.cv)}>CV</a>}
+      </div>
+    </section>
+
+    <div class="section-stack">
+      <section>
+        <div class="section-header">
+          <h2>Upcoming</h2>
+          <a href={withBase('/events/')}>All events</a>
+        </div>
+        <ol class="item-list list-panel">
+          {
+            upcomingEvents.length > 0 ? (
+              upcomingEvents.map((event) => (
+                <li class="item-row">
+                  <header>
+                    <h3><a href={withBase(`/events/${entrySlug(event)}/`)}>{event.data.title}</a></h3>
+                    <time datetime={event.data.date.toISOString()}>{formatDate(event.data.date)}</time>
+                  </header>
+                  <p>{event.data.summary}</p>
+                  <span class="meta">{event.data.location}</span>
+                </li>
+              ))
+            ) : (
+              <li class="item-row">
+                <p>No upcoming events yet.</p>
+              </li>
+            )
+          }
+        </ol>
+      </section>
+
+      <section>
+        <div class="section-header">
+          <h2>Latest Updates</h2>
+          <a href={withBase('/posts/')}>Browse writing</a>
+        </div>
+        <ol class="item-list list-panel">
+          {
+            latestUpdates.map((item) => (
+              <li class="item-row">
+                <header>
+                  <h3><a href={withBase(item.href)}>{item.title}</a></h3>
+                  <time datetime={item.date.toISOString()}>{formatDate(item.date)}</time>
+                </header>
+                <p>{item.summary}</p>
+                <span class="meta">{item.kind}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+    </div>
+  </div>
+
+  <section class="spaced-section">
+    <div class="section-header">
+      <h2>Featured Writing</h2>
+      <a href={withBase('/posts/')}>All articles</a>
+    </div>
+    <div class="card-grid">
+      {
+        featuredPosts.map((post) => (
+          <article class="content-card">
+            <p class="meta">{formatDate(post.data.date)} · {post.data.type}</p>
+            <h3><a href={withBase(`/posts/${entrySlug(post)}/`)}>{post.data.title}</a></h3>
+            <p>{post.data.summary}</p>
+            <TagList tags={post.data.tags} />
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="spaced-section">
+    <div class="section-header">
+      <h2>Project Highlights</h2>
+      <a href={withBase('/projects/')}>All projects</a>
+    </div>
+    <div class="card-grid">
+      {
+        featuredProjects.map((project) => (
+          <article class="content-card">
+            <p class="meta">{project.data.status}</p>
+            <h3><a href={withBase(`/projects/${entrySlug(project)}/`)}>{project.data.title}</a></h3>
+            <p>{project.data.summary}</p>
+            <TagList tags={project.data.tags} />
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

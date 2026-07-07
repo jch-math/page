@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content';
+import PageTitle from '@components/PageTitle.astro';
+import TagList from '@components/TagList.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { entrySlug, publicProject, withBase } from '@lib/site';
+
+const statusRank = { active: 0, paused: 1, completed: 2, archived: 3 };
+const projects = (await getCollection('projects'))
+  .filter(publicProject)
+  .sort((a, b) => statusRank[a.data.status] - statusRank[b.data.status] || Number(b.data.date) - Number(a.data.date));
+---
+
+<BaseLayout title="Projects" description="Active and completed projects with related notes and resources.">
+  <PageTitle title="Projects" description="Active and completed projects with related notes and resources." />
+  <div class="card-grid">
+    {
+      projects.map((project) => (
+        <article class="content-card">
+          <p class="meta">{project.data.status}</p>
+          <h2><a href={withBase(`/projects/${entrySlug(project)}/`)}>{project.data.title}</a></h2>
+          <p>{project.data.description ?? project.data.summary}</p>
+          <TagList tags={project.data.tags} />
+          <div class="links">
+            {project.data.links.repository && <a href={project.data.links.repository}>Repository</a>}
+            {project.data.links.demo && <a href={project.data.links.demo}>Demo</a>}
+            {project.data.links.documentation && <a href={project.data.links.documentation}>Docs</a>}
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</BaseLayout>

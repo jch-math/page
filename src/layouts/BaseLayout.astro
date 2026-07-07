@@ -1,0 +1,31 @@
+---
+import { getEntry } from 'astro:content';
+import SiteFooter from '@components/SiteFooter.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import '@styles/global.css';
+
+const profileEntry = await getEntry('profile', 'site');
+const profile = profileEntry?.data;
+const {
+  title = profile?.siteTitle ?? 'Self Page',
+  description = profile?.tagline ?? 'A personal homepage and public archive.',
+} = Astro.props;
+const fullTitle = title === profile?.siteTitle ? title : `${title} | ${profile?.siteTitle ?? 'Self Page'}`;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{fullTitle}</title>
+  </head>
+  <body>
+    <SiteHeader profile={profile} />
+    <main>
+      <slot />
+    </main>
+    <SiteFooter profile={profile} />
+  </body>
+</html>

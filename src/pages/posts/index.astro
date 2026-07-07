@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import PageTitle from '@components/PageTitle.astro';
+import TagList from '@components/TagList.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { byDateDesc, entrySlug, formatDate, uniqueTags, visiblePost, withBase } from '@lib/site';
+
+const posts = (await getCollection('posts')).filter(visiblePost).sort(byDateDesc);
+const tags = uniqueTags(posts);
+---
+
+<BaseLayout title="Articles" description="Articles, notes, logs, reviews, and tutorials.">
+  <PageTitle title="Articles" description="Articles, notes, logs, reviews, and tutorials." />
+  <nav class="filter-band" aria-label="Article tags">
+    {tags.map((tag) => <a class="pill" href={withBase(`/tags/${encodeURIComponent(tag)}/`)}>{tag}</a>)}
+  </nav>
+  <ol class="item-list list-panel">
+    {
+      posts.map((post) => (
+        <li class="item-row">
+          <header>
+            <h2><a href={withBase(`/posts/${entrySlug(post)}/`)}>{post.data.title}</a></h2>
+            <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+          </header>
+          <p>{post.data.summary}</p>
+          <TagList tags={post.data.tags} />
+        </li>
+      ))
+    }
+  </ol>
+</BaseLayout>

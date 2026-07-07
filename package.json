@@ -1,0 +1,29 @@
+{
+  "name": "self-page",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "sync": "astro sync",
+    "new:post": "node scripts/new-content.mjs post",
+    "new:event": "node scripts/new-content.mjs event",
+    "new:resource": "node scripts/new-content.mjs resource",
+    "new:project": "node scripts/new-content.mjs project"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "latest",
+    "@astrojs/rss": "latest",
+    "@astrojs/sitemap": "latest",
+    "astro": "latest"
+  },
+  "devDependencies": {
+    "@astrojs/check": "latest",
+    "@types/node": "latest",
+    "typescript": "latest"
+  },
+  "packageManager": "pnpm@11.7.0"
+}

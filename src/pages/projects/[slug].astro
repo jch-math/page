@@ -1,0 +1,40 @@
+---
+import { getCollection, render } from 'astro:content';
+import ContentMeta from '@components/ContentMeta.astro';
+import PageTitle from '@components/PageTitle.astro';
+import TagList from '@components/TagList.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { entrySlug, publicProject } from '@lib/site';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).filter(publicProject);
+  return projects.map((project) => ({
+    params: { slug: entrySlug(project) },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={project.data.title} description={project.data.summary}>
+  <PageTitle eyebrow={project.data.status} title={project.data.title} description={project.data.summary} />
+  <div class="detail-grid">
+    <aside>
+      <ContentMeta date={project.data.date} updated={project.data.updated} status={project.data.status} />
+      <TagList tags={project.data.tags} />
+      <section class="attachment-list">
+        <h2>Links</h2>
+        <ul>
+          {project.data.links.repository && <li><a href={project.data.links.repository}>Repository</a></li>}
+          {project.data.links.demo && <li><a href={project.data.links.demo}>Demo</a></li>}
+          {project.data.links.documentation && <li><a href={project.data.links.documentation}>Documentation</a></li>}
+        </ul>
+      </section>
+    </aside>
+    <article class="prose">
+      <Content />
+    </article>
+  </div>
+</BaseLayout>

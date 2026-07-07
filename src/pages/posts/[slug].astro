@@ -1,0 +1,46 @@
+---
+import { getCollection, render } from 'astro:content';
+import AttachmentList from '@components/AttachmentList.astro';
+import ContentMeta from '@components/ContentMeta.astro';
+import PageTitle from '@components/PageTitle.astro';
+import TagList from '@components/TagList.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { entrySlug, visiblePost } from '@lib/site';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('posts')).filter(visiblePost);
+  return posts.map((post) => ({
+    params: { slug: entrySlug(post) },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+---
+
+<BaseLayout title={post.data.title} description={post.data.summary}>
+  <PageTitle eyebrow={post.data.type} title={post.data.title} description={post.data.summary} />
+  <div class="detail-grid">
+    <aside>
+      <ContentMeta date={post.data.date} updated={post.data.updated} status={post.data.status} type={post.data.type} />
+      <TagList tags={post.data.tags} />
+      <AttachmentList attachments={post.data.attachments} />
+      {
+        headings.length > 0 && (
+          <nav aria-label="Table of contents">
+            <h2>Contents</h2>
+            <ol>
+              {headings.filter((heading) => heading.depth <= 3).map((heading) => (
+                <li><a href={`#${heading.slug}`}>{heading.text}</a></li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+    </aside>
+    <article class="prose">
+      <Content />
+    </article>
+  </div>
+</BaseLayout>

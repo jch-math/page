@@ -1,6 +1,18 @@
 ---
 import { withBase } from '@lib/site';
 
+interface Attachment {
+  title: string;
+  type: string;
+  url: string;
+  description?: string;
+}
+
+interface Props {
+  attachments?: Attachment[];
+  title?: string;
+}
+
 const { attachments = [], title = 'Materials' } = Astro.props;
 ---
 

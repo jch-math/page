@@ -24,6 +24,7 @@ const projects = (await getCollection('projects')).filter(publicProject).sort(by
 const upcomingEvents = events.filter(isUpcomingEvent).sort(byDateAsc).slice(0, 4);
 const featuredPosts = posts.filter((post) => post.data.featured).slice(0, 3);
 const featuredProjects = projects.filter((project) => project.data.featured).slice(0, 3);
+const interests = profile?.interests ?? [];
 
 const latestUpdates = [
   ...posts.map((entry) => ({
@@ -66,9 +67,9 @@ const latestUpdates = [
       <p>{profile?.bio}</p>
       {profile?.affiliation && <p class="muted">{profile.affiliation}</p>}
       {
-        profile?.interests?.length > 0 && (
+        interests.length > 0 && (
           <ul class="tag-list" aria-label="Interests">
-            {profile.interests.map((interest) => (
+            {interests.map((interest) => (
               <li><span class="pill">{interest}</span></li>
             ))}
           </ul>

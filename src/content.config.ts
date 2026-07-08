@@ -1,5 +1,6 @@
 import { glob } from 'astro/loaders';
-import { defineCollection, reference, z } from 'astro:content';
+import { defineCollection, reference } from 'astro:content';
+import { z } from 'astro/zod';
 
 const localOrExternalUrl = z
   .string()
@@ -14,7 +15,12 @@ const relatedSchema = z
     resources: z.array(reference('resources')).default([]),
     projects: z.array(reference('projects')).default([]),
   })
-  .default({});
+  .default({
+    posts: [],
+    events: [],
+    resources: [],
+    projects: [],
+  });
 
 const attachmentSchema = z.object({
   title: z.string(),

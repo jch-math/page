@@ -5,6 +5,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import { withBase } from '@lib/site';
 
 const profile = (await getEntry('profile', 'site'))?.data;
+const interests = profile?.interests ?? [];
 ---
 
 <BaseLayout title="About" description={profile?.bio}>
@@ -26,11 +27,11 @@ const profile = (await getEntry('profile', 'site'))?.data;
     <section class="text-stack">
       <h2>Bio</h2>
       <p>{profile?.bio}</p>
-      {profile?.interests?.length > 0 && (
+      {interests.length > 0 && (
         <>
           <h2>Interests</h2>
           <ul class="tag-list" aria-label="Interests">
-            {profile.interests.map((interest) => (
+            {interests.map((interest) => (
               <li><span class="pill">{interest}</span></li>
             ))}
           </ul>

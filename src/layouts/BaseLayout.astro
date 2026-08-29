@@ -35,7 +35,7 @@ const absoluteSocialImage = socialImage
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f3efe4" />
+    <meta name="theme-color" content="#f7f4ec" data-theme-color />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" type="application/rss+xml" title="Neko 的文章" href={withBase('/rss.xml')} />
     <meta property="og:type" content={props.article ? 'article' : 'website'} />
@@ -52,13 +52,7 @@ const absoluteSocialImage = socialImage
     <script is:inline>
       (() => {
         const media = window.matchMedia('(prefers-color-scheme: dark)');
-        const applySystemTheme = () => {
-          if (!localStorage.getItem('neko-theme')) {
-            document.documentElement.dataset.theme = media.matches ? 'dark' : 'light';
-          }
-        };
         document.documentElement.dataset.theme = localStorage.getItem('neko-theme') ?? (media.matches ? 'dark' : 'light');
-        media.addEventListener('change', applySystemTheme);
       })();
     </script>
   </head>
@@ -71,10 +65,28 @@ const absoluteSocialImage = socialImage
     <SiteFooter profile={profile} />
     <script is:inline>
       const button = document.querySelector('[data-theme-toggle]');
+      const themeColor = document.querySelector('[data-theme-color]');
+      const syncThemeButton = () => {
+        const dark = document.documentElement.dataset.theme === 'dark';
+        button?.setAttribute('aria-pressed', String(dark));
+        button?.setAttribute('aria-label', dark ? '切换为浅色主题' : '切换为深色主题');
+        button?.setAttribute('title', dark ? '切换为浅色主题' : '切换为深色主题');
+        themeColor?.setAttribute('content', dark ? '#151916' : '#f7f4ec');
+      };
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+      const applySystemTheme = () => {
+        if (!localStorage.getItem('neko-theme')) {
+          document.documentElement.dataset.theme = systemTheme.matches ? 'dark' : 'light';
+          syncThemeButton();
+        }
+      };
+      syncThemeButton();
+      systemTheme.addEventListener('change', applySystemTheme);
       button?.addEventListener('click', () => {
         const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
         document.documentElement.dataset.theme = next;
         localStorage.setItem('neko-theme', next);
+        syncThemeButton();
       });
     </script>
   </body>

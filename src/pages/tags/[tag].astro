@@ -16,6 +16,6 @@ const { tagName, items } = Astro.props;
 ---
 
 <BaseLayout title={`#${tagName}`} description={`带有 ${tagName} 标签的公开内容。`}>
-  <PageHeader index="TAG" title={`#${tagName}`} description={`共有 ${items.length} 条相关内容。`} />
+  <PageHeader title={`#${tagName}`} description="带有这个标签的公开内容。" />
   <ContentList items={items} />
 </BaseLayout>

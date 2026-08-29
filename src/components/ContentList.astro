@@ -1,6 +1,5 @@
 ---
-import TagList from '@components/TagList.astro';
-import { formatDate, typeLabel, type ContentIndexItem } from '@lib/site';
+import { formatDate, type ContentIndexItem } from '@lib/site';
 
 interface Props {
   items: ContentIndexItem[];
@@ -17,15 +16,20 @@ const { items, emptyMessage = '这里还没有内容。' } = Astro.props;
         const external = /^https?:\/\//.test(item.href);
         return (
           <li>
-            <a href={item.href} target={external ? '_blank' : undefined} rel={external ? 'noreferrer' : undefined}>
+            <article class="content-list-item">
+              <p class="content-list-meta">
+                <time datetime={item.date}>{formatDate(item.date)}</time>
+              </p>
               <div class="content-list-main">
-                <p class="meta">{typeLabel(item.type)} · {formatDate(item.date)}</p>
-                <h2>{item.title}</h2>
+                <h2>
+                  <a href={item.href} target={external ? '_blank' : undefined} rel={external ? 'noreferrer' : undefined}>
+                    {item.title}
+                    {external && <span class="visually-hidden">（在新窗口打开）</span>}
+                  </a>
+                </h2>
                 <p>{item.summary}</p>
-                <TagList tags={item.tags} />
               </div>
-              <span class="arrow" aria-hidden="true">{external ? '↗' : '→'}</span>
-            </a>
+            </article>
           </li>
         );
       })}

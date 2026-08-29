@@ -18,14 +18,12 @@ const toc = headings.filter((heading) => heading.depth <= 3);
 <BaseLayout title={post.data.title} description={post.data.summary} socialImage={post.data.cover?.image ?? null} article>
   <article class="detail-page">
     <header class="detail-header">
-      <p class="section-index">文章 · {post.data.type === 'note' ? 'NOTE' : 'ARTICLE'}</p>
       <h1>{post.data.title}</h1>
       <p class="detail-summary">{post.data.summary}</p>
       <div class="detail-byline">
         <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
         {post.data.updated && <span>更新于 {formatDate(post.data.updated)}</span>}
       </div>
-      <TagList tags={post.data.tags} />
     </header>
     {post.data.cover && <img class="detail-cover" src={withBase(post.data.cover.image)} alt={post.data.cover.alt} />}
     <div class="article-layout">
@@ -38,5 +36,9 @@ const toc = headings.filter((heading) => heading.depth <= 3);
       <div class="prose"><Content /></div>
     </div>
     <AttachmentList items={post.data.attachments} />
+    <footer class="detail-footer">
+      <p class="detail-kind">{post.data.type === 'note' ? '笔记' : '文章'}</p>
+      <TagList tags={post.data.tags} />
+    </footer>
   </article>
 </BaseLayout>

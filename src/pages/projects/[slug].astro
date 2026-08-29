@@ -22,14 +22,13 @@ const projectLinks = [
 <BaseLayout title={project.data.title} description={project.data.summary} socialImage={project.data.cover?.image ?? null} article>
   <article class="detail-page">
     <header class="detail-header">
-      <p class="section-index">项目 · {projectStatusLabel(project.data.status)}</p>
       <h1>{project.data.title}</h1>
       <p class="detail-summary">{project.data.summary}</p>
       <div class="detail-byline">
+        <span>{projectStatusLabel(project.data.status)}</span>
         <time datetime={project.data.date.toISOString()}>始于 {formatDate(project.data.date)}</time>
         {project.data.updated && <span>更新于 {formatDate(project.data.updated)}</span>}
       </div>
-      <TagList tags={project.data.tags} />
       {projectLinks.length > 0 && (
         <nav class="project-links" aria-label="项目链接">
           {projectLinks.map(([label, href]) => <a href={withBase(href)}>{label} <span aria-hidden="true">↗</span></a>)}
@@ -39,5 +38,9 @@ const projectLinks = [
     {project.data.cover && <img class="detail-cover" src={withBase(project.data.cover.image)} alt={project.data.cover.alt} />}
     <div class="prose project-prose"><Content /></div>
     <AttachmentList items={project.data.documents} title="项目资料" />
+    <footer class="detail-footer">
+      <p class="detail-kind">项目</p>
+      <TagList tags={project.data.tags} />
+    </footer>
   </article>
 </BaseLayout>

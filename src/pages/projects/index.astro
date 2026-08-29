@@ -8,6 +8,9 @@ const projects = (await getPublicContent()).filter((item) => item.type === 'proj
 ---
 
 <BaseLayout title="项目" description="正在推进和已经完成的个人项目。">
-  <PageHeader index="02 · PROJECTS" title="项目" description="把想法做成可以使用、阅读或继续讨论的东西，也保留过程中的取舍。" />
+  <PageHeader
+    title="项目"
+    description="把想法做成可以使用、阅读或继续讨论的东西，也保留过程中的取舍。"
+  />
   <ContentList items={projects} emptyMessage="项目正在整理中。" />
 </BaseLayout>

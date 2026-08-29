@@ -2,14 +2,15 @@
 import ContentList from '@components/ContentList.astro';
 import PageHeader from '@components/PageHeader.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { getPublicContent, uniqueTags } from '@lib/site';
+import { getPublicContent } from '@lib/site';
 
 const posts = (await getPublicContent()).filter((item) => item.type === 'post');
-const tags = uniqueTags(posts);
 ---
 
 <BaseLayout title="文章" description="一些关于人工智能、微分几何与日常思考的文章和短笔记。">
-  <PageHeader index="01 · WRITING" title="文章" description="长短不一的记录。它们不一定给出答案，但尽量保留思考发生时的线索。" />
-  {tags.length > 0 && <p class="collection-summary">{posts.length} 篇内容 · {tags.length} 个标签</p>}
+  <PageHeader
+    title="文章"
+    description="长短不一的记录。它们不一定给出答案，但尽量保留思考发生时的线索。"
+  />
   <ContentList items={posts} emptyMessage="第一篇文章正在路上。" />
 </BaseLayout>

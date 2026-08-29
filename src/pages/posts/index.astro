@@ -2,9 +2,9 @@
 import ContentList from '@components/ContentList.astro';
 import PageHeader from '@components/PageHeader.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { getPublicContent } from '@lib/site';
+import { loadPublicCatalog } from '@lib/content';
 
-const posts = (await getPublicContent()).filter((item) => item.type === 'post');
+const posts = (await loadPublicCatalog()).posts.map(({ item }) => item);
 ---
 
 <BaseLayout title="文章" description="一些关于人工智能、微分几何与日常思考的文章和短笔记。">

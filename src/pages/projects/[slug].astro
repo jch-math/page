@@ -1,13 +1,14 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import AttachmentList from '@components/AttachmentList.astro';
 import TagList from '@components/TagList.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { entrySlug, formatDate, projectStatusLabel, visibleProject, withBase } from '@lib/site';
+import { loadPublicCatalog } from '@lib/content';
+import { formatDate, projectStatusLabel, withBase } from '@lib/site';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects', visibleProject);
-  return projects.map((project) => ({ params: { slug: entrySlug(project) }, props: { project } }));
+  const { projects } = await loadPublicCatalog();
+  return projects.map(({ entry, item }) => ({ params: { slug: item.slug }, props: { project: entry } }));
 }
 
 const { project } = Astro.props;

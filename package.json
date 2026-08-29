@@ -8,25 +8,31 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "test": "node --test tests/content-schema.test.ts tests/content-catalog.test.ts",
+    "verify:dist": "node scripts/verify-dist.mjs",
+    "verify": "node scripts/verify.mjs",
     "sync": "astro sync",
     "new:post": "node scripts/new-content.mjs post",
     "new:project": "node scripts/new-content.mjs project",
     "new:link": "node scripts/new-content.mjs link"
   },
   "dependencies": {
-    "@astrojs/mdx": "latest",
-    "@astrojs/markdown-remark": "latest",
-    "@astrojs/rss": "latest",
-    "@astrojs/sitemap": "latest",
-    "astro": "latest",
-    "katex": "latest",
-    "rehype-katex": "latest",
-    "remark-math": "latest"
+    "@astrojs/mdx": "7.0.8",
+    "@astrojs/markdown-remark": "7.2.4",
+    "@astrojs/rss": "4.0.19",
+    "@astrojs/sitemap": "3.7.3",
+    "astro": "7.2.9",
+    "katex": "0.18.4",
+    "rehype-katex": "7.0.1",
+    "remark-math": "6.0.0"
   },
   "devDependencies": {
-    "@astrojs/check": "latest",
-    "@types/node": "latest",
-    "typescript": "^6.0.3"
+    "@astrojs/check": "0.9.10",
+    "@types/node": "26.4.0",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": "24.14.0"
   },
   "packageManager": "pnpm@11.7.0"
 }

@@ -1,9 +1,10 @@
-import { getPublicContent } from '@lib/site';
+import { loadPublicCatalog } from '@lib/content';
 
 export const prerender = true;
 
 export async function GET() {
-  return new Response(JSON.stringify({ version: 1, items: await getPublicContent() }, null, 2), {
+  const { items } = await loadPublicCatalog();
+  return new Response(JSON.stringify({ version: 1, items }, null, 2), {
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
   });
 }

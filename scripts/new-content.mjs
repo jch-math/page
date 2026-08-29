@@ -49,7 +49,7 @@ function slugify(value, valueDate) {
 }
 
 function template(contentKind, contentTitle, contentSlug, contentDate) {
-  const common = `title: "${escapeYaml(contentTitle)}"\nslug: "${contentSlug}"\ndate: "${contentDate}"\nsummary: "请用一两句话概括内容。"`;
+  const common = `title: "${escapeYaml(contentTitle)}"\nslug: "${contentSlug}"\ndate: "${contentDate}"\nsummary: ""`;
   return {
     post: `---\n${common}\ntype: "article"\nstatus: "draft"\nlanguage: "zh"\ntags: []\nfeatured: false\nattachments: []\n---\n\n从这里开始写作。\n`,
     project: `---\n${common}\nstatus: "draft"\ntags: []\nfeatured: false\nlinks: {}\ndocuments: []\n---\n\n记录项目的背景、过程和结果。\n`,

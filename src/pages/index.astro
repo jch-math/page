@@ -1,16 +1,13 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
 import ContentList from '@components/ContentList.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { formatDate, getPublicContent, normalizeContent, visiblePost } from '@lib/site';
+import { loadPublicCatalog, loadSiteProfile } from '@lib/content';
+import { formatDate } from '@lib/site';
 
-const profile = (await getEntry('profile', 'site'))?.data;
-const content = await getPublicContent();
-const featuredPost = (await getCollection('posts', (entry) => visiblePost(entry) && entry.data.featured)).sort(
-  (a, b) => Number(b.data.date) - Number(a.data.date),
-)[0];
-const featuredArticle = featuredPost ? normalizeContent(featuredPost) : undefined;
-const recentItems = content.slice(0, 3);
+const [profile, catalog] = await Promise.all([loadSiteProfile(), loadPublicCatalog()]);
+const featuredPost = catalog.featuredPost?.entry;
+const featuredArticle = catalog.featuredPost?.item;
+const recentItems = catalog.items.slice(0, 3);
 const singleColumn = !featuredArticle || recentItems.length === 0;
 const focusMode = Boolean(featuredArticle && recentItems.length > 0);
 ---
@@ -18,8 +15,8 @@ const focusMode = Boolean(featuredArticle && recentItems.length > 0);
 <BaseLayout title={profile?.siteTitle} description={profile?.tagline}>
   <section class="home-overview" aria-labelledby="intro-title">
     <header class="home-profile">
-      <h1 id="intro-title">你好，我是 {profile?.name ?? 'Neko'}。</h1>
-      <p>{profile?.tagline} {profile?.bio}</p>
+      <h1 id="intro-title">你好，我是 {profile.name}。</h1>
+      <p>{profile.tagline} {profile.bio}</p>
     </header>
 
     {(featuredArticle || recentItems.length > 0) && (

@@ -1,13 +1,14 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import AttachmentList from '@components/AttachmentList.astro';
 import TagList from '@components/TagList.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { entrySlug, formatDate, visiblePost, withBase } from '@lib/site';
+import { loadPublicCatalog } from '@lib/content';
+import { formatDate, withBase } from '@lib/site';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts', visiblePost);
-  return posts.map((post) => ({ params: { slug: entrySlug(post) }, props: { post } }));
+  const { posts } = await loadPublicCatalog();
+  return posts.map(({ entry, item }) => ({ params: { slug: item.slug }, props: { post: entry } }));
 }
 
 const { post } = Astro.props;

@@ -2,13 +2,13 @@
 import ContentList from '@components/ContentList.astro';
 import PageHeader from '@components/PageHeader.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { getPublicContent, uniqueTags } from '@lib/site';
+import { loadPublicCatalog } from '@lib/content';
 
 export async function getStaticPaths() {
-  const items = await getPublicContent();
-  return uniqueTags(items).map((tag) => ({
+  const catalog = await loadPublicCatalog();
+  return catalog.tags.map((tag) => ({
     params: { tag },
-    props: { tagName: tag, items: items.filter((item) => item.tags.includes(tag)) },
+    props: { tagName: tag, items: catalog.items.filter((item) => item.tags.includes(tag)) },
   }));
 }
 

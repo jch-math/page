@@ -1,7 +1,7 @@
 ---
-import { getEntry } from 'astro:content';
 import SiteFooter from '@components/SiteFooter.astro';
 import SiteHeader from '@components/SiteHeader.astro';
+import { loadSiteProfile } from '@lib/content';
 import { withBase } from '@lib/site';
 import 'katex/dist/katex.min.css';
 import '@styles/global.css';
@@ -13,11 +13,11 @@ interface Props {
   article?: boolean;
 }
 
-const profile = (await getEntry('profile', 'site'))?.data;
+const profile = await loadSiteProfile();
 const props = Astro.props as Props;
-const title = props.title ?? profile?.siteTitle ?? 'Neko';
-const description = props.description ?? profile?.tagline ?? 'Neko 的个人研究手帐';
-const fullTitle = title === profile?.siteTitle ? title : `${title} | ${profile?.siteTitle ?? 'Neko'}`;
+const title = props.title ?? profile.siteTitle;
+const description = props.description ?? profile.tagline;
+const fullTitle = title === profile.siteTitle ? title : `${title} | ${profile.siteTitle}`;
 const siteOrigin = Astro.site ?? new URL('https://jch-math.github.io');
 const canonical = new URL(Astro.url.pathname, siteOrigin).href;
 const hasSocialImageProp = Object.prototype.hasOwnProperty.call(props, 'socialImage');
@@ -39,7 +39,7 @@ const absoluteSocialImage = socialImage
     <link rel="canonical" href={canonical} />
     <link rel="alternate" type="application/rss+xml" title="Neko 的文章" href={withBase('/rss.xml')} />
     <meta property="og:type" content={props.article ? 'article' : 'website'} />
-    <meta property="og:site_name" content={profile?.siteTitle ?? 'Neko'} />
+    <meta property="og:site_name" content={profile.siteTitle} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />

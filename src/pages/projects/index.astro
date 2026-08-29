@@ -2,9 +2,9 @@
 import ContentList from '@components/ContentList.astro';
 import PageHeader from '@components/PageHeader.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { getPublicContent } from '@lib/site';
+import { loadPublicCatalog } from '@lib/content';
 
-const projects = (await getPublicContent()).filter((item) => item.type === 'project');
+const projects = (await loadPublicCatalog()).projects.map(({ item }) => item);
 ---
 
 <BaseLayout title="项目" description="正在推进和已经完成的个人项目。">

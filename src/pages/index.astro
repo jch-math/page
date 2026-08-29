@@ -1,25 +1,96 @@
 ---
-import { getEntry } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import ContentList from '@components/ContentList.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { getPublicContent, withBase } from '@lib/site';
+import { formatDate, getPublicContent, normalizeContent, visiblePost } from '@lib/site';
 
 const profile = (await getEntry('profile', 'site'))?.data;
 const content = await getPublicContent();
-const latest = content.slice(0, 3);
+const featuredPost = (await getCollection('posts', (entry) => visiblePost(entry) && entry.data.featured)).sort(
+  (a, b) => Number(b.data.date) - Number(a.data.date),
+)[0];
+const featuredArticle = featuredPost ? normalizeContent(featuredPost) : undefined;
+const recentItems = content.slice(0, 3);
+const singleColumn = !featuredArticle || recentItems.length === 0;
+const focusMode = Boolean(featuredArticle && recentItems.length > 0);
 ---
 
 <BaseLayout title={profile?.siteTitle} description={profile?.tagline}>
   <section class="home-overview" aria-labelledby="intro-title">
-    <div class="home-profile">
+    <header class="home-profile">
       <h1 id="intro-title">你好，我是 {profile?.name ?? 'Neko'}。</h1>
       <p>{profile?.tagline} {profile?.bio}</p>
-      <a href={withBase('/posts/')}>浏览文章 <span aria-hidden="true">→</span></a>
-    </div>
+    </header>
 
-    <div class="home-latest">
-      <h2>最近更新</h2>
-      <ContentList items={latest} />
-    </div>
+    {(featuredArticle || recentItems.length > 0) && (
+      <div
+        class:list={['home-content', singleColumn && 'home-content--single', focusMode && 'home-content--focus']}
+        data-home-focus={focusMode ? '' : undefined}
+      >
+        {featuredArticle && featuredPost && (
+          <article class="home-featured">
+            <div class="home-featured-meta">
+              <time datetime={featuredPost.data.date.toISOString()}>{formatDate(featuredPost.data.date)}</time>
+            </div>
+            <h2><a href={featuredArticle.href}>{featuredArticle.title}</a></h2>
+            <p>{featuredArticle.summary}</p>
+          </article>
+        )}
+
+        {recentItems.length > 0 && (
+          <section class="home-latest" aria-label="最近更新" data-home-recent={focusMode ? '' : undefined}>
+            <p class="home-section-label">最近更新</p>
+            <ContentList items={recentItems} />
+          </section>
+        )}
+      </div>
+    )}
   </section>
+
+  <script>
+    const focusSection = document.querySelector<HTMLElement>('[data-home-focus]');
+    const recentSection = focusSection?.querySelector<HTMLElement>('[data-home-recent]');
+
+    if (focusSection && recentSection) {
+      const desktop = window.matchMedia('(min-width: 901px)');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let animationFrame = 0;
+
+      const resetRecentSection = () => {
+        focusSection.style.removeProperty('--home-recent-opacity');
+        recentSection.inert = false;
+        recentSection.removeAttribute('aria-hidden');
+      };
+
+      const updateRecentSection = () => {
+        animationFrame = 0;
+
+        if (!desktop.matches || reducedMotion.matches) {
+          resetRecentSection();
+          return;
+        }
+
+        const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        const fadeDistance = Math.max(1, Math.min(280, maxScroll));
+        const progress = Math.min(1, Math.max(0, window.scrollY / fadeDistance));
+        const easedProgress = progress * progress * (3 - 2 * progress);
+        const hidden = progress >= 0.98;
+
+        focusSection.style.setProperty('--home-recent-opacity', String(1 - easedProgress));
+        recentSection.inert = hidden;
+        if (hidden) recentSection.setAttribute('aria-hidden', 'true');
+        else recentSection.removeAttribute('aria-hidden');
+      };
+
+      const scheduleUpdate = () => {
+        if (!animationFrame) animationFrame = window.requestAnimationFrame(updateRecentSection);
+      };
+
+      window.addEventListener('scroll', scheduleUpdate, { passive: true });
+      window.addEventListener('resize', scheduleUpdate);
+      desktop.addEventListener('change', scheduleUpdate);
+      reducedMotion.addEventListener('change', scheduleUpdate);
+      updateRecentSection();
+    }
+  </script>
 </BaseLayout>

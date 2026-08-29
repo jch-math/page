@@ -43,6 +43,10 @@ const posts = defineCollection({
     .refine((data) => !data.updated || data.updated >= data.date, {
       message: 'updated 不能早于 date',
       path: ['updated'],
+    })
+    .refine((data) => data.status === 'published' || !data.featured, {
+      message: '只有已发布文章可以设为精选',
+      path: ['featured'],
     }),
 });
 

@@ -35,7 +35,7 @@ const absoluteSocialImage = socialImage
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f7f4ec" data-theme-color />
+    <meta name="theme-color" content="#ffffff" data-theme-color />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" type="application/rss+xml" title="Neko 的文章" href={withBase('/rss.xml')} />
     <meta property="og:type" content={props.article ? 'article' : 'website'} />
@@ -71,7 +71,7 @@ const absoluteSocialImage = socialImage
         button?.setAttribute('aria-pressed', String(dark));
         button?.setAttribute('aria-label', dark ? '切换为浅色主题' : '切换为深色主题');
         button?.setAttribute('title', dark ? '切换为浅色主题' : '切换为深色主题');
-        themeColor?.setAttribute('content', dark ? '#151916' : '#f7f4ec');
+        themeColor?.setAttribute('content', dark ? '#151916' : '#ffffff');
       };
       const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
       const applySystemTheme = () => {

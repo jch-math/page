@@ -1,0 +1,23 @@
+---
+import { getCollection } from 'astro:content';
+import ContentList from '@components/ContentList.astro';
+import PageHeader from '@components/PageHeader.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { normalizeContent, visibleLink } from '@lib/site';
+
+const links = (await getCollection('links', visibleLink)).sort((a, b) => Number(b.data.date) - Number(a.data.date));
+const groups = Object.entries(Object.groupBy(links, (entry) => entry.data.category));
+---
+
+<BaseLayout title="链接" description="值得反复阅读、使用或分享的链接收藏。">
+  <PageHeader index="03 · LINKS" title="链接" description="收藏不是囤积。这里只留下那些值得再次打开，也愿意分享给朋友的东西。" />
+  <div class="link-groups">
+    {groups.map(([category, entries]) => (
+      <section>
+        <h2>{category}</h2>
+        <ContentList items={(entries ?? []).map((entry) => normalizeContent(entry))} />
+      </section>
+    ))}
+    {groups.length === 0 && <div class="empty-state"><p>链接收藏正在整理中。</p></div>}
+  </div>
+</BaseLayout>

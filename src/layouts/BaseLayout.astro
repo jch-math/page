@@ -2,15 +2,31 @@
 import { getEntry } from 'astro:content';
 import SiteFooter from '@components/SiteFooter.astro';
 import SiteHeader from '@components/SiteHeader.astro';
+import { withBase } from '@lib/site';
+import 'katex/dist/katex.min.css';
 import '@styles/global.css';
 
-const profileEntry = await getEntry('profile', 'site');
-const profile = profileEntry?.data;
-const {
-  title = profile?.siteTitle ?? 'Self Page',
-  description = profile?.tagline ?? 'A personal homepage and public archive.',
-} = Astro.props;
-const fullTitle = title === profile?.siteTitle ? title : `${title} | ${profile?.siteTitle ?? 'Self Page'}`;
+interface Props {
+  title?: string;
+  description?: string;
+  socialImage?: string | null;
+  article?: boolean;
+}
+
+const profile = (await getEntry('profile', 'site'))?.data;
+const props = Astro.props as Props;
+const title = props.title ?? profile?.siteTitle ?? 'Neko';
+const description = props.description ?? profile?.tagline ?? 'Neko 的个人研究手帐';
+const fullTitle = title === profile?.siteTitle ? title : `${title} | ${profile?.siteTitle ?? 'Neko'}`;
+const siteOrigin = Astro.site ?? new URL('https://jch-math.github.io');
+const canonical = new URL(Astro.url.pathname, siteOrigin).href;
+const hasSocialImageProp = Object.prototype.hasOwnProperty.call(props, 'socialImage');
+const socialImage = hasSocialImageProp ? props.socialImage : '/og.png';
+const absoluteSocialImage = socialImage
+  ? /^https?:\/\//.test(socialImage)
+    ? socialImage
+    : new URL(withBase(socialImage), siteOrigin).href
+  : undefined;
 ---
 
 <!doctype html>
@@ -19,13 +35,47 @@ const fullTitle = title === profile?.siteTitle ? title : `${title} | ${profile?.
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#f3efe4" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title="Neko 的文章" href={withBase('/rss.xml')} />
+    <meta property="og:type" content={props.article ? 'article' : 'website'} />
+    <meta property="og:site_name" content={profile?.siteTitle ?? 'Neko'} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {absoluteSocialImage && <meta property="og:image" content={absoluteSocialImage} />}
+    <meta name="twitter:card" content={absoluteSocialImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    {absoluteSocialImage && <meta name="twitter:image" content={absoluteSocialImage} />}
     <title>{fullTitle}</title>
+    <script is:inline>
+      (() => {
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+        const applySystemTheme = () => {
+          if (!localStorage.getItem('neko-theme')) {
+            document.documentElement.dataset.theme = media.matches ? 'dark' : 'light';
+          }
+        };
+        document.documentElement.dataset.theme = localStorage.getItem('neko-theme') ?? (media.matches ? 'dark' : 'light');
+        media.addEventListener('change', applySystemTheme);
+      })();
+    </script>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">跳到正文</a>
     <SiteHeader profile={profile} />
-    <main>
+    <main id="main-content">
       <slot />
     </main>
     <SiteFooter profile={profile} />
+    <script is:inline>
+      const button = document.querySelector('[data-theme-toggle]');
+      button?.addEventListener('click', () => {
+        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        localStorage.setItem('neko-theme', next);
+      });
+    </script>
   </body>
 </html>

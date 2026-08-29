@@ -1,31 +1,15 @@
 ---
-import { getCollection } from 'astro:content';
-import PageTitle from '@components/PageTitle.astro';
-import TagList from '@components/TagList.astro';
+import ContentList from '@components/ContentList.astro';
+import PageHeader from '@components/PageHeader.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { byDateDesc, entrySlug, formatDate, uniqueTags, visiblePost, withBase } from '@lib/site';
+import { getPublicContent, uniqueTags } from '@lib/site';
 
-const posts = (await getCollection('posts')).filter(visiblePost).sort(byDateDesc);
+const posts = (await getPublicContent()).filter((item) => item.type === 'post');
 const tags = uniqueTags(posts);
 ---
 
-<BaseLayout title="Articles" description="Articles, notes, logs, reviews, and tutorials.">
-  <PageTitle title="Articles" description="Articles, notes, logs, reviews, and tutorials." />
-  <nav class="filter-band" aria-label="Article tags">
-    {tags.map((tag) => <a class="pill" href={withBase(`/tags/${encodeURIComponent(tag)}/`)}>{tag}</a>)}
-  </nav>
-  <ol class="item-list list-panel">
-    {
-      posts.map((post) => (
-        <li class="item-row">
-          <header>
-            <h2><a href={withBase(`/posts/${entrySlug(post)}/`)}>{post.data.title}</a></h2>
-            <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
-          </header>
-          <p>{post.data.summary}</p>
-          <TagList tags={post.data.tags} />
-        </li>
-      ))
-    }
-  </ol>
+<BaseLayout title="文章" description="一些关于人工智能、微分几何与日常思考的文章和短笔记。">
+  <PageHeader index="01 · WRITING" title="文章" description="长短不一的记录。它们不一定给出答案，但尽量保留思考发生时的线索。" />
+  {tags.length > 0 && <p class="collection-summary">{posts.length} 篇内容 · {tags.length} 个标签</p>}
+  <ContentList items={posts} emptyMessage="第一篇文章正在路上。" />
 </BaseLayout>

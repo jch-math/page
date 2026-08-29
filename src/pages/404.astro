@@ -1,0 +1,13 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { withBase } from '@lib/site';
+---
+
+<BaseLayout title="页面未找到" description="这个页面不存在，或已经被移动。" socialImage={null}>
+  <section class="not-found">
+    <p class="section-index">404 · LOST NOTE</p>
+    <h1>这一页暂时找不到。</h1>
+    <p>它可能被移动、删除，或者从一开始就只存在于某张草稿纸上。</p>
+    <a class="button-link" href={withBase('/')}>返回首页</a>
+  </section>
+</BaseLayout>

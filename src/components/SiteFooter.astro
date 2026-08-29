@@ -8,13 +8,11 @@ const copyrightName = profile?.footer?.copyrightName ?? profile?.name ?? 'Self P
 
 <footer class="site-footer">
   <div>
-    <strong>{copyrightName}</strong>
-    <span>{year}</span>
+    <span>© {year} {copyrightName}</span>
     {profile?.footer?.license && <span>{profile.footer.license}</span>}
   </div>
-  <nav aria-label="Footer navigation">
+  <nav aria-label="页脚导航">
     <a href={withBase('/rss.xml')}>RSS</a>
     {profile?.links?.github && <a href={profile.links.github}>GitHub</a>}
-    {profile?.links?.email && <a href={profile.links.email}>Email</a>}
   </nav>
 </footer>

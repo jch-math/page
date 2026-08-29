@@ -8,24 +8,18 @@ interface Attachment {
   description?: string;
 }
 
-interface Props {
-  attachments?: Attachment[];
-  title?: string;
-}
-
-const { attachments = [], title = 'Materials' } = Astro.props;
+const { items = [], title = '附件与资料' }: { items?: Attachment[]; title?: string } = Astro.props;
 ---
 
 {
-  attachments.length > 0 && (
-    <section class="attachment-list" aria-labelledby={`${title.toLowerCase()}-heading`}>
-      <h2 id={`${title.toLowerCase()}-heading`}>{title}</h2>
+  items.length > 0 && (
+    <section class="attachment-list" aria-labelledby="attachments-heading">
+      <h2 id="attachments-heading">{title}</h2>
       <ul>
-        {attachments.map((item) => (
+        {items.map((item) => (
           <li>
-            <a href={withBase(item.url)}>{item.title}</a>
-            <span>{item.type}</span>
-            {item.description && <p>{item.description}</p>}
+            <a href={withBase(item.url)}>{item.title} <span aria-hidden="true">↗</span></a>
+            <span>{item.type}{item.description ? ` · ${item.description}` : ''}</span>
           </li>
         ))}
       </ul>

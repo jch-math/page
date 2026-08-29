@@ -1,23 +1,16 @@
 ---
-title: "Self Page"
+title: "Neko 的个人主页"
 slug: "self-page"
-date: "2026-07-07"
+date: "2026-08-29"
 status: "active"
-summary: "The personal homepage and public archive project."
-description: "A static personal site for publishing articles, events, resources, and project notes."
+summary: "一个用于整理文章、项目和链接的静态个人主页，也是一份持续生长的公开手帐。"
+description: "使用 Astro 构建并部署到 GitHub Pages，内容以 Markdown 和 MDX 长期维护。"
 tags:
   - "Astro"
   - "GitHub Pages"
 links:
-  repository: "https://github.com/username/self-page"
+  repository: "https://github.com/jch-math/page"
 featured: true
-related:
-  posts:
-    - "welcome-note"
-  events:
-    - "weekly-seminar-introduction"
-  resources:
-    - "example-paper-notes"
 ---
 
-This project page can later collect implementation notes, design decisions, and release updates.
+这个项目用来承载本站的设计与内容。它希望保持轻量、耐读，并为以后增加搜索、评论或更多内容类型留出清晰边界。

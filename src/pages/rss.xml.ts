@@ -1,21 +1,19 @@
 import rss from '@astrojs/rss';
-import type { APIContext } from 'astro';
-import { getCollection, getEntry } from 'astro:content';
-import { entrySlug, visiblePost } from '@lib/site';
+import { getCollection } from 'astro:content';
+import { entrySlug, visiblePost, withBase } from '@lib/site';
 
-export async function GET(context: APIContext) {
-  const profile = (await getEntry('profile', 'site'))?.data;
-  const posts = (await getCollection('posts')).filter(visiblePost).sort((a, b) => Number(b.data.date) - Number(a.data.date));
-
+export async function GET(context: { site?: URL }) {
+  const posts = (await getCollection('posts', visiblePost)).sort((a, b) => Number(b.data.date) - Number(a.data.date));
+  const site = new URL(withBase('/'), context.site ?? 'https://jch-math.github.io');
   return rss({
-    title: profile?.siteTitle ?? 'Self Page',
-    description: profile?.tagline ?? 'A personal homepage and public archive.',
-    site: context.site ?? 'https://example.com',
+    title: 'Neko 的文章',
+    description: '关于人工智能、微分几何与日常思考的文章和短笔记。',
+    site,
     items: posts.map((post) => ({
       title: post.data.title,
-      pubDate: post.data.date,
       description: post.data.summary,
-      link: `/posts/${entrySlug(post)}/`,
+      pubDate: post.data.date,
+      link: withBase(`/posts/${entrySlug(post)}/`),
     })),
   });
 }

@@ -10,20 +10,23 @@
     "check": "astro check",
     "sync": "astro sync",
     "new:post": "node scripts/new-content.mjs post",
-    "new:event": "node scripts/new-content.mjs event",
-    "new:resource": "node scripts/new-content.mjs resource",
-    "new:project": "node scripts/new-content.mjs project"
+    "new:project": "node scripts/new-content.mjs project",
+    "new:link": "node scripts/new-content.mjs link"
   },
   "dependencies": {
     "@astrojs/mdx": "latest",
+    "@astrojs/markdown-remark": "latest",
     "@astrojs/rss": "latest",
     "@astrojs/sitemap": "latest",
-    "astro": "latest"
+    "astro": "latest",
+    "katex": "latest",
+    "rehype-katex": "latest",
+    "remark-math": "latest"
   },
   "devDependencies": {
     "@astrojs/check": "latest",
     "@types/node": "latest",
-    "typescript": "latest"
+    "typescript": "^6.0.3"
   },
   "packageManager": "pnpm@11.7.0"
 }

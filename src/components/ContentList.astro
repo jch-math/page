@@ -1,0 +1,38 @@
+---
+import TagList from '@components/TagList.astro';
+import { formatDate, typeLabel, type ContentIndexItem } from '@lib/site';
+
+interface Props {
+  items: ContentIndexItem[];
+  emptyMessage?: string;
+}
+
+const { items, emptyMessage = '这里还没有内容。' } = Astro.props;
+---
+
+{
+  items.length > 0 ? (
+    <ol class="content-list">
+      {items.map((item) => {
+        const external = /^https?:\/\//.test(item.href);
+        return (
+          <li>
+            <a href={item.href} target={external ? '_blank' : undefined} rel={external ? 'noreferrer' : undefined}>
+              <div class="content-list-main">
+                <p class="meta">{typeLabel(item.type)} · {formatDate(item.date)}</p>
+                <h2>{item.title}</h2>
+                <p>{item.summary}</p>
+                <TagList tags={item.tags} />
+              </div>
+              <span class="arrow" aria-hidden="true">{external ? '↗' : '→'}</span>
+            </a>
+          </li>
+        );
+      })}
+    </ol>
+  ) : (
+    <div class="empty-state">
+      <p>{emptyMessage}</p>
+    </div>
+  )
+}

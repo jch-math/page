@@ -1,20 +1,14 @@
 ---
-import { withBase } from '@lib/site';
+import { tagHref } from '@lib/site';
 
-interface Props {
-  tags?: string[];
-}
-
-const { tags = [] } = Astro.props;
+const { tags = [], linked = true }: { tags?: string[]; linked?: boolean } = Astro.props;
 ---
 
 {
   tags.length > 0 && (
-    <ul class="tag-list" aria-label="Tags">
+    <ul class="tag-list" aria-label="标签">
       {tags.map((tag) => (
-        <li>
-          <a href={withBase(`/tags/${encodeURIComponent(tag)}/`)}>{tag}</a>
-        </li>
+        <li>{linked ? <a href={tagHref(tag)}>#{tag}</a> : <span>#{tag}</span>}</li>
       ))}
     </ul>
   )

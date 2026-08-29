@@ -1,40 +1,43 @@
 ---
 import { getCollection, render } from 'astro:content';
-import ContentMeta from '@components/ContentMeta.astro';
-import PageTitle from '@components/PageTitle.astro';
+import AttachmentList from '@components/AttachmentList.astro';
 import TagList from '@components/TagList.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { entrySlug, publicProject } from '@lib/site';
+import { entrySlug, formatDate, projectStatusLabel, visibleProject, withBase } from '@lib/site';
 
 export async function getStaticPaths() {
-  const projects = (await getCollection('projects')).filter(publicProject);
-  return projects.map((project) => ({
-    params: { slug: entrySlug(project) },
-    props: { project },
-  }));
+  const projects = await getCollection('projects', visibleProject);
+  return projects.map((project) => ({ params: { slug: entrySlug(project) }, props: { project } }));
 }
 
 const { project } = Astro.props;
 const { Content } = await render(project);
+const projectLinks = [
+  ['代码仓库', project.data.links.repository],
+  ['在线演示', project.data.links.demo],
+  ['项目文档', project.data.links.documentation],
+].filter((item): item is [string, string] => Boolean(item[1]));
 ---
 
-<BaseLayout title={project.data.title} description={project.data.summary}>
-  <PageTitle eyebrow={project.data.status} title={project.data.title} description={project.data.summary} />
-  <div class="detail-grid">
-    <aside>
-      <ContentMeta date={project.data.date} updated={project.data.updated} status={project.data.status} />
+<BaseLayout title={project.data.title} description={project.data.summary} socialImage={project.data.cover?.image ?? null} article>
+  <article class="detail-page">
+    <header class="detail-header">
+      <p class="section-index">项目 · {projectStatusLabel(project.data.status)}</p>
+      <h1>{project.data.title}</h1>
+      <p class="detail-summary">{project.data.summary}</p>
+      <div class="detail-byline">
+        <time datetime={project.data.date.toISOString()}>始于 {formatDate(project.data.date)}</time>
+        {project.data.updated && <span>更新于 {formatDate(project.data.updated)}</span>}
+      </div>
       <TagList tags={project.data.tags} />
-      <section class="attachment-list">
-        <h2>Links</h2>
-        <ul>
-          {project.data.links.repository && <li><a href={project.data.links.repository}>Repository</a></li>}
-          {project.data.links.demo && <li><a href={project.data.links.demo}>Demo</a></li>}
-          {project.data.links.documentation && <li><a href={project.data.links.documentation}>Documentation</a></li>}
-        </ul>
-      </section>
-    </aside>
-    <article class="prose">
-      <Content />
-    </article>
-  </div>
+      {projectLinks.length > 0 && (
+        <nav class="project-links" aria-label="项目链接">
+          {projectLinks.map(([label, href]) => <a href={withBase(href)}>{label} <span aria-hidden="true">↗</span></a>)}
+        </nav>
+      )}
+    </header>
+    {project.data.cover && <img class="detail-cover" src={withBase(project.data.cover.image)} alt={project.data.cover.alt} />}
+    <div class="prose project-prose"><Content /></div>
+    <AttachmentList items={project.data.documents} title="项目资料" />
+  </article>
 </BaseLayout>

@@ -1,33 +1,13 @@
 ---
-import { getCollection } from 'astro:content';
-import PageTitle from '@components/PageTitle.astro';
-import TagList from '@components/TagList.astro';
+import ContentList from '@components/ContentList.astro';
+import PageHeader from '@components/PageHeader.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { entrySlug, publicProject, withBase } from '@lib/site';
+import { getPublicContent } from '@lib/site';
 
-const statusRank = { active: 0, paused: 1, completed: 2, archived: 3 };
-const projects = (await getCollection('projects'))
-  .filter(publicProject)
-  .sort((a, b) => statusRank[a.data.status] - statusRank[b.data.status] || Number(b.data.date) - Number(a.data.date));
+const projects = (await getPublicContent()).filter((item) => item.type === 'project');
 ---
 
-<BaseLayout title="Projects" description="Active and completed projects with related notes and resources.">
-  <PageTitle title="Projects" description="Active and completed projects with related notes and resources." />
-  <div class="card-grid">
-    {
-      projects.map((project) => (
-        <article class="content-card">
-          <p class="meta">{project.data.status}</p>
-          <h2><a href={withBase(`/projects/${entrySlug(project)}/`)}>{project.data.title}</a></h2>
-          <p>{project.data.description ?? project.data.summary}</p>
-          <TagList tags={project.data.tags} />
-          <div class="links">
-            {project.data.links.repository && <a href={project.data.links.repository}>Repository</a>}
-            {project.data.links.demo && <a href={project.data.links.demo}>Demo</a>}
-            {project.data.links.documentation && <a href={project.data.links.documentation}>Docs</a>}
-          </div>
-        </article>
-      ))
-    }
-  </div>
+<BaseLayout title="项目" description="正在推进和已经完成的个人项目。">
+  <PageHeader index="02 · PROJECTS" title="项目" description="把想法做成可以使用、阅读或继续讨论的东西，也保留过程中的取舍。" />
+  <ContentList items={projects} emptyMessage="项目正在整理中。" />
 </BaseLayout>

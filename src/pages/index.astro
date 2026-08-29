@@ -1,10 +1,10 @@
 ---
 import ContentList from '@components/ContentList.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { loadPublicCatalog, loadSiteProfile } from '@lib/content';
+import { loadPublicCatalog } from '@lib/content';
 import { formatDate } from '@lib/site';
 
-const [profile, catalog] = await Promise.all([loadSiteProfile(), loadPublicCatalog()]);
+const catalog = await loadPublicCatalog();
 const featuredPost = catalog.featuredPost?.entry;
 const featuredArticle = catalog.featuredPost?.item;
 const recentItems = catalog.items.slice(0, 3);
@@ -12,13 +12,8 @@ const singleColumn = !featuredArticle || recentItems.length === 0;
 const focusMode = Boolean(featuredArticle && recentItems.length > 0);
 ---
 
-<BaseLayout title={profile?.siteTitle} description={profile?.tagline}>
-  <section class="home-overview" aria-labelledby="intro-title">
-    <header class="home-profile">
-      <h1 id="intro-title">你好，我是 {profile.name}。</h1>
-      <p>{profile.tagline} {profile.bio}</p>
-    </header>
-
+<BaseLayout>
+  <section class="home-overview">
     {(featuredArticle || recentItems.length > 0) && (
       <div
         class:list={['home-content', singleColumn && 'home-content--single', focusMode && 'home-content--focus']}
@@ -29,7 +24,7 @@ const focusMode = Boolean(featuredArticle && recentItems.length > 0);
             <div class="home-featured-meta">
               <time datetime={featuredPost.data.date.toISOString()}>{formatDate(featuredPost.data.date)}</time>
             </div>
-            <h2><a href={featuredArticle.href}>{featuredArticle.title}</a></h2>
+            <h1><a href={featuredArticle.href}>{featuredArticle.title}</a></h1>
             <p>{featuredArticle.summary}</p>
           </article>
         )}
